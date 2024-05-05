@@ -4,7 +4,7 @@ import Timestamp from '@ui/Timestamp';
 import {NavLink} from 'react-router-dom';
 import Trend from '@ui/Trend';
 import Counter from '@components/Counter';
-
+import Button from '@mui/material/Button';
 // utils
 import {getCategory, getStatusColor, numFormatter} from '@utils/helpers';
 import dayjs from 'dayjs';
@@ -280,77 +280,65 @@ export const PRODUCTS_MANAGEMENT_COLUMN_DEFS = [
         </div>,
         dataIndex: 'image',
         width: 45,
-        render: image =>
+        render: (image, record) => (
             <div className="img-wrapper w-[45px] h-[45px] flex items-center justify-center">
-                <img src={image} alt="product"/>
+                <img src={record.product_thumb} alt="product"/>
             </div>
+        )
     },
     {
         title: 'Product name',
-        dataIndex: 'name',
-        render: text => <span className="inline-block h6 !text-sm max-w-[155px]">{text}</span>
+        dataIndex: 'product_name',
+        render: (product_name) => <span className="inline-block h6 !text-sm max-w-[155px]">{product_name}</span>
     },
-    {title: 'SKU', dataIndex: 'sku'},
     {
-        title: 'Stock',
-        dataIndex: 'stock',
+        title: 'Quantity',
+        dataIndex: 'product_quantity',
         width: 130,
-        render: stock =>
+        render: product_quantity =>
             <div className="flex items-center gap-5">
-                {
-                    stock == null ?
-                        'On Demand'
-                        :
-                        <span>
-                        <span className={`${stock !== 0 ? 'text-green' : 'text-red'}`}>
-                            {stock !== 0 ? (stock >= 10 ? 'In stock ' : 'Low Inventory ') : 'Out of stock '}
+                {                 
+                        <span>                   
+                        ({product_quantity})
                         </span>
-                        ({stock})
-                    </span>
                 }
             </div>
     },
     {
         title: 'Price',
-        dataIndex: 'price',
-        render: price => <span>${price ? price.toFixed(2) : '0.00'}</span>
+        dataIndex: 'product_price',
+        render: product_price => <span>${product_price}</span>
     },
-    {
-        title: 'Category',
-        dataIndex: 'category',
-        render: category => <button className="text-accent capitalize">{category}</button>,
-        responsive: ['xxl'],
-    },
-    {
-        title: 'Type',
-        dataIndex: 'type',
-        render: type => <span className="capitalize">{type}</span>,
-        responsive: ['lg'],
-    },
+    // {
+    //     title: 'Status',
+    //     dataIndex: 'is_deleted',
+    //     render: product_is_deleted => <span className="capitalize">
+    //         {product_is_deleted ?<Button  variant="contained" color="success">Secondary</Button> : <Button variant="contained" color="success">Secondary</Button>}
+    //         </span>,
+    //     responsive: ['lg'],
+    // },
    
    
-  
     {
-        title: 'Date',
-        dataIndex: 'date',
-        render: date =>
+        title: 'Description',
+        dataIndex: 'product_description',
+        render: product_description =>
             <div className="flex flex-col">
-                <span>Last modified:</span>
                 <span className="font-bold text-header">
-                    {date && dayjs(date).format('DD/MM/YYYY')}
+                  {product_description}
                 </span>
             </div>,
         responsive: ['lg'],
     },
     {
-        title: 'Actions',
-        dataIndex: 'actions',
-        render: () =>
-            <div className="flex items-center justify-end gap-11">
-                <NavLink to="/product-editor" aria-label="Edit">
-                    <i className="icon icon-pen-to-square-regular text-lg leading-none"/>
-                </NavLink>
-               
-            </div>
-    }
+        title: 'Date',
+        dataIndex: 'created_at',
+        render: created_at =>
+            <div className="flex flex-col">
+                <span className="font-bold text-header">
+                    {created_at}
+                </span>
+            </div>,
+        responsive: ['lg'],
+    },
 ]

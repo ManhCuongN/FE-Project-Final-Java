@@ -1,12 +1,12 @@
 // components
-import React, {  useState, useContext } from 'react';
+import React, { useContext, useReducer, useState } from "react";
 import Spring from "@components/Spring";
 import Select from "@ui/Select";
 import RangeDatePicker from "@ui/RangeDatePicker";
 import DropFiles from "@components/DropFiles";
 import { toast } from "react-toastify";
 import MediaDropPlaceholder from "@ui/MediaDropPlaceholder";
-
+import { ProductContext } from "@contexts/ProductContext";
 // hooks
 import { useForm, Controller } from "react-hook-form";
 
@@ -20,46 +20,30 @@ import {
   UNITS_OPTIONS,
 } from "@constants/options";
 
-
-import {ProductContext} from '@contexts/ProductContext'
-
 // utils
 import classNames from "classnames";
 import dayjs from "dayjs";
 
-const ProductEditor = () => {
-
-  const [imageUrl, setImageUrl] = useState(null)
-  const {addProduct} = useContext(ProductContext)
+const UpdateProduct = () => {
+  const {
+    productState: { product },
+    updateProduct,
+    setShowModalUpdateProduct
+  } = useContext(ProductContext);
+  const [imageUrl, setImageUrl] = useState(product.product_thumb)
   const categories = PRODUCT_CATEGORIES.filter(
     (category) => category.value !== "all"
   );
-  
+  const productDescription = ``;
+
   const {
     register,
     handleSubmit,
     control,
     formState: { errors },
-  } = useForm({});
-
-  // do something with the data
-  const handlePublish = async (data) => {
-    const newProduct = {
-        ...data,
-        productThumb:imageUrl,
-        productQuantity: parseInt(data.productQuantity),
-        productPrice: parseFloat(data.productPrice)
-    }
-    console.log("new", newProduct);
-    const res = await addProduct(newProduct)
-    if(res.errors) {
-       res.errors.map(((err) => {
-        toast.error(err);
-       }))
-    } else {
-        toast.success(res.message);
-    }
-  };
+  } = useForm({
+    product
+  });
 
   const handleFileUpload = (files) => {
     if (files.length > 0) {
@@ -85,6 +69,25 @@ const ProductEditor = () => {
     }
   };
 
+  // do something with the data
+  const handlePublish = async (data) => {
+    const updateProductData = {
+       ...data,
+       productThumb: imageUrl,
+       product_id: product.product_id
+       
+    }
+    const res = await updateProduct(updateProductData)
+    if(res.errors) {
+        res.errors.map(((err) => {
+         toast.error(err);
+        }))
+     } else {
+      toast.success(res.message);
+      setShowModalUpdateProduct(false)
+  }
+  };
+
   return (
     <Spring className="card flex-1 xl:py-10">
       <h5 className="mb-[15px]">Product Settings</h5>
@@ -96,22 +99,17 @@ const ProductEditor = () => {
               <Controller
                 name="productThumb"
                 control={control}
+                
                 render={({ field }) => (
                   <DropFiles
                     wrapperClass="media-dropzone 2xl:col-span-2"
                     onChange={handleFileUpload}
                   >
-                    {imageUrl ? (
-            
-                      <img
-                        src={imageUrl}
-                        alt="Uploaded Image"
-                        style={{ width: "100%", height: "auto" }}
-                      />
-                    ) : (
-                     
-                      <MediaDropPlaceholder />
-                    )}
+                    <img
+                      src={imageUrl}
+                      alt="Uploaded Image"
+                      style={{ width: "100%", height: "auto" }}
+                    />
                   </DropFiles>
                 )}
               />
@@ -127,7 +125,8 @@ const ProductEditor = () => {
                   `field-input !h-[160px] !py-[15px] !overflow-y-auto`,
                   { "field-input--error": errors.description }
                 )}
-                id="description"
+                id="productDescription"
+                defaultValue={product.product_description}
                 {...register("productDescription", { required: true })}
               />
             </div>
@@ -143,6 +142,7 @@ const ProductEditor = () => {
                 "field-input--error": errors.productName,
               })}
               id="productName"
+              defaultValue={product.product_name}
               placeholder="Enter product name"
               {...register("productName", { required: true })}
             />
@@ -151,23 +151,23 @@ const ProductEditor = () => {
           <div className="grid grid-cols-1 gap-y-4 gap-x-2 sm:grid-cols-2">
             <div className="field-wrapper">
               <label className="field-label" htmlFor="regularPrice">
-                Regular Price
+                Product Price
               </label>
               <input
                 className={classNames("field-input", {
                   "field-input--error": errors.regularPrice,
                 })}
                 id="productPrice"
+                defaultValue={product.product_price}
                 placeholder="$99.99"
                 {...register("productPrice", {
                   required: true,
-                  pattern: {
-                    value: /^[0-9]*$/,
-                    message: "Please enter a valid number.", // Thông báo lỗi nếu không hợp lệ
-                },
+                  pattern: /^[0-9]*$/,
                 })}
               />
             </div>
+           
+           
             <div className="field-wrapper">
               <label className="field-label" htmlFor="salePrice">
                 Quantity
@@ -177,6 +177,7 @@ const ProductEditor = () => {
                   "field-input--error": errors.salePrice,
                 })}
                 id="productQuantity"
+                defaultValue={product.product_quantity}
                 placeholder="1"
                 {...register("productQuantity", {
                   required: true,
@@ -199,4 +200,4 @@ const ProductEditor = () => {
   );
 };
 
-export default ProductEditor;
+export default UpdateProduct;

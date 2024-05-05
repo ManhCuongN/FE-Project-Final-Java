@@ -29,6 +29,7 @@ import {ToastContainer} from 'react-toastify';
 import Sidebar from '@layout/Sidebar';
 import Copyright from '@components/Copyright';
 import AppBar from '@layout/AppBar';
+import ProductContextProvider from "@contexts/productContext";
 
 // pages
 
@@ -56,6 +57,7 @@ const App = () => {
     }, []);
 
     return (
+        <ProductContextProvider>
         <SidebarProvider>
             <ThemeProvider theme={{theme: theme}}>
                 <ThemeStyles/>
@@ -86,6 +88,7 @@ const App = () => {
                 </div>
             </ThemeProvider>
         </SidebarProvider>
+        </ProductContextProvider>
     );
 }
 

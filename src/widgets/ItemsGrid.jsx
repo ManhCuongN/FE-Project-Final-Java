@@ -5,9 +5,9 @@ import Pagination from '@ui/Pagination';
 import CategoryHeader from '@ui/CategoryHeader';
 
 // hooks
-import {useState, useEffect} from 'react';
+import {useState, useEffect, useContext} from 'react';
 import usePagination from '@hooks/usePagination';
-
+import Spinner from "react-bootstrap/Spinner";
 // constants
 import {PRODUCT_CATEGORIES, PRODUCT_SORT_OPTIONS} from '@constants/options';
 
@@ -15,22 +15,54 @@ import {PRODUCT_CATEGORIES, PRODUCT_SORT_OPTIONS} from '@constants/options';
 import {sortProducts} from '@utils/helpers';
 
 // data placeholder
-import products from '@db/products';
+// import products from '@db/products';
+
+//dataa
+import {ProductContext} from '../contexts/productContext'
 
 const ItemsGrid = () => {
     const options = PRODUCT_CATEGORIES.filter(option => option.value !== 'all');
     const [category, setCategory] = useState(options[0]);
     const [sort, setSort] = useState(PRODUCT_SORT_OPTIONS[0]);
 
+    
+
+    const {productState: { products, product, isProductLoading }, getProduct} = useContext(ProductContext)
     const productsByCategory = products.filter(product => product.category === category.value);
     const sortedProducts = sortProducts(productsByCategory, sort.value);
     const pagination = usePagination(sortedProducts, 12);
-
     useEffect(() => {
         pagination.goToPage(0);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [category, sort]);
+
+    useEffect(() => {
+      getProduct()
+    }, [])
+     let bodyProduct;
+     if(isProductLoading) {
+        bodyProduct = (
+            <div className="spinner-container">
+             <Spinner animation="border" variant="info" />
+            </div>
+        )
+     } else {
+        bodyProduct = (
+            <div className="grid flex-1 items-start gap-[26px] mt-5 mb-[30px] sm:grid-cols-2 md:grid-cols-3 md:mt-7
+                 lg:grid-cols-4 2xl:grid-cols-6">
+                {
+                   products.map((product) => {
+                    return (
+                         <ProductGridItem  product={product} key={product.product_id}/>
+                    )
+                   })
+                       
+                    
+                }
+            </div> 
+        )
+     }
 
     return (
         <>
@@ -42,19 +74,12 @@ const ItemsGrid = () => {
                      2xl:col-start-5 2xl:col-end-7">
                     <span className="lg:text-right">View products: {pagination.showingOf()}</span>
                     <div className="grid gap-2.5 sm:grid-cols-2 sm:gap-[26px]">
-                        <Select value={category} onChange={setCategory} options={options}/>
-                        <Select value={sort} onChange={setSort} options={PRODUCT_SORT_OPTIONS}/>
+                        {/* <Select value={category} onChange={setCategory} options={options}/>
+                        <Select value={sort} onChange={setSort} options={PRODUCT_SORT_OPTIONS}/> */}
                     </div>
                 </div>
             </div>
-             <div className="grid flex-1 items-start gap-[26px] mt-5 mb-[30px] sm:grid-cols-2 md:grid-cols-3 md:mt-7
-                 lg:grid-cols-4 2xl:grid-cols-6">
-                {
-                    pagination.currentItems().map((product, index) => (
-                        <ProductGridItem key={`${product.id}-${sort.value}-${category.value}`} product={product} index={index}/>
-                    ))
-                }
-            </div> 
+             {bodyProduct}
             {
                 pagination.maxPage > 1 && <Pagination pagination={pagination}/>
             }
