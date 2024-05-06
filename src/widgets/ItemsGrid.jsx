@@ -3,7 +3,7 @@ import ProductGridItem from '@components/ProductGridItem';
 import Select from '@ui/Select';
 import Pagination from '@ui/Pagination';
 import CategoryHeader from '@ui/CategoryHeader';
-
+import Search from '@ui/Search'
 // hooks
 import {useState, useEffect, useContext} from 'react';
 import usePagination from '@hooks/usePagination';
@@ -27,7 +27,7 @@ const ItemsGrid = () => {
 
     
 
-    const {productState: { products, product, isProductLoading }, getProduct} = useContext(ProductContext)
+    const {productState: { products, product, isProductLoading }, searchProduct, getProduct} = useContext(ProductContext)
     const productsByCategory = products.filter(product => product.category === category.value);
     const sortedProducts = sortProducts(productsByCategory, sort.value);
     const pagination = usePagination(sortedProducts, 12);
@@ -64,6 +64,12 @@ const ItemsGrid = () => {
         )
      }
 
+     const [searchQuery, setSearchQuery] = useState('');
+
+     const handleSearchChange = async(value) => {
+       await searchProduct(value)
+     };
+
     return (
         <>
             <div className="grid gap-[26px] lg:grid-cols-4 2xl:grid-cols-6">
@@ -72,8 +78,13 @@ const ItemsGrid = () => {
                 </div>
                 <div className="flex flex-col-reverse gap-4 lg:flex-col lg:gap-3 lg:col-start-3 lg:col-end-5
                      2xl:col-start-5 2xl:col-end-7">
-                    <span className="lg:text-right">View products: {pagination.showingOf()}</span>
+                    
                     <div className="grid gap-2.5 sm:grid-cols-2 sm:gap-[26px]">
+                    <Search placeholder="Search Product"
+        query={searchQuery}
+        setQuery={setSearchQuery}
+        wrapperClass="lg:w-[326px]"
+        onChange={handleSearchChange}/>
                         {/* <Select value={category} onChange={setCategory} options={options}/>
                         <Select value={sort} onChange={setSort} options={PRODUCT_SORT_OPTIONS}/> */}
                     </div>

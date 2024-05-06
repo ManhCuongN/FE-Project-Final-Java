@@ -30,6 +30,7 @@ import dayjs from "dayjs";
 const ProductEditor = () => {
 
   const [imageUrl, setImageUrl] = useState(null)
+  const [isUploading, setIsUploading] = useState(false);
   const {addProduct} = useContext(ProductContext)
   const categories = PRODUCT_CATEGORIES.filter(
     (category) => category.value !== "all"
@@ -69,6 +70,8 @@ const ProductEditor = () => {
       const formData = new FormData();
       formData.append("file", file);
 
+      setIsUploading(true); 
+
       fetch("http://localhost:8081/api/v1/images/upload", {
         method: "POST",
         body: formData,
@@ -79,9 +82,11 @@ const ProductEditor = () => {
 
         })
         .catch((error) => {
-          console.error("Upload failed:", error);
-          
-        });
+          console.error("Upload failed:", error);         
+        })
+        .finally(() => {
+          setIsUploading(false); // Reset uploading state
+        });;
     }
   };
 
@@ -101,15 +106,20 @@ const ProductEditor = () => {
                     wrapperClass="media-dropzone 2xl:col-span-2"
                     onChange={handleFileUpload}
                   >
+                     {isUploading && (
+                      <div className="relative w-full h-full flex items-center justify-center">
+                        <p className="absolute bg-white bg-opacity-70 px-4 py-2 rounded-lg shadow-lg">
+                          Uploading...
+                        </p>
+                      </div>
+                    )}
                     {imageUrl ? (
-            
                       <img
                         src={imageUrl}
                         alt="Uploaded Image"
-                        style={{ width: "100%", height: "auto" }}
+                        style={{ width: '100%', height: 'auto' }}
                       />
                     ) : (
-                     
                       <MediaDropPlaceholder />
                     )}
                   </DropFiles>

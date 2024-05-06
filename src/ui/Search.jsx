@@ -1,13 +1,20 @@
 import PropTypes from 'prop-types';
 
-const Search = ({placeholder = 'Search...', query, setQuery, wrapperClass}) => {
+const Search = ({placeholder = 'Search...', query, setQuery, wrapperClass, onChange}) => {
+    const handleInputChange = (e) => {
+        const inputValue = e.target.value;
+        setQuery(inputValue); // Cập nhật state query trong component cha
+        if (onChange) {
+          onChange(inputValue); // Gọi hàm onChange được truyền từ component cha
+        }
+      };
     return (
         <div className={`relative ${wrapperClass || ''}`}>
             <input className="field-input !pr-[60px]"
                    type="search"
                    placeholder={placeholder}
                    value={query}
-                   onChange={e => setQuery(e.target.value)}/>
+                   onChange={handleInputChange}/>
             <button className={`field-btn text-red !right-[40px] transition ${query ? 'opacity-100' : 'opacity-0'}`}
                     onClick={() => setQuery('')}
                     aria-label="Clear all">

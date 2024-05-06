@@ -48,6 +48,16 @@ const ProductContextProvider = ({ children }) => {
       console.log("err",error);
     }
   }
+
+  const searchProduct = async(keyWord) => {
+    try {
+      const response = await axios.get(`${apiURL}/searchKeyWord?keyword=${keyWord}`); 
+      dispatch({ type: "SEARCH_PRODUCT", payload: response.data.metadata });
+      return response.data;
+    } catch (error) {
+      console.log("err",error);
+    }
+  }
   
   //Context Data
   const productContextData = {
@@ -57,7 +67,8 @@ const ProductContextProvider = ({ children }) => {
     setShowModalUpdateProduct,
     findProduct,
     addProduct,
-    updateProduct
+    updateProduct,
+    searchProduct
   };
 
   return (

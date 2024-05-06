@@ -33,7 +33,14 @@ export const productReducer = (state, action) => {
                 ...state,
                 products: newProduct,
             };
-          
+
+            case "SEARCH_PRODUCT":
+                return {
+                    ...state,
+                    products: payload,
+                    isProductLoading: false,
+                  };
+
      
       default:
         return state;
